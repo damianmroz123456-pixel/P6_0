@@ -3,6 +3,7 @@ import java.util.*;
 
 class WrongStudentName extends Exception {}
 class WrongAge extends Exception {}
+class WrongDateOfBirth extends Exception {}
 
 public class Main {
     public static Scanner scan = new Scanner(System.in);
@@ -30,6 +31,8 @@ public class Main {
                 System.out.println("Błędne imię studenta!");
             } catch (WrongAge e) {
                 System.out.println("Błędny wiek! Poprawny zakres: 1-99");
+            } catch (WrongDateOfBirth e) {
+                System.out.println("Błędna data urodzenia! Format DD-MM-YYYY");
             } catch (IOException e) {
                 System.out.println("Błąd pliku!");
             }
@@ -62,12 +65,22 @@ public class Main {
         return age;
     }
 
-    public static void addStudent() throws IOException, WrongStudentName, WrongAge {
-        String name = readName();
-        int age = readAge();
+    public static String readDate() throws WrongDateOfBirth {
         scan.nextLine();
         System.out.print("Podaj datę urodzenia (DD-MM-YYYY): ");
         String date = scan.nextLine();
+
+        if (!date.matches("\\\\d{2}-\\\\d{2}-\\\\d{4}"))
+            throw new WrongDateOfBirth();
+
+        return date;
+    }
+
+    public static void addStudent() throws IOException, WrongStudentName, WrongAge, WrongDateOfBirth {
+        String name = readName();
+        int age = readAge();
+        String date = readDate();
+
         new Service().addStudent(new Student(name, age, date));
         System.out.println("Student dodany");
     }

@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import java.time.*;
+import java.time.format.*;
 
 class WrongStudentName extends Exception {}
 class WrongAge extends Exception {}
@@ -35,7 +37,7 @@ public class Main {
             } catch (WrongAge e) {
                 System.out.println("Błędny wiek! Zakres 1-99");
             } catch (WrongDateOfBirth e) {
-                System.out.println("Błędna data! Format DD-MM-YYYY");
+                System.out.println("Błędna data urodzenia! Format DD-MM-YYYY");
             } catch (InputMismatchException e) {
                 System.out.println("Menu przyjmuje tylko liczby!");
                 scan.nextLine();
@@ -79,8 +81,15 @@ public class Main {
         scan.nextLine();
         System.out.print("Podaj datę urodzenia (DD-MM-YYYY): ");
         String date = scan.nextLine();
-        if (!date.matches("\\d{2}-\\d{2}-\\d{4}"))
+
+        try {
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate.parse(date, formatter);
+        } catch (DateTimeParseException e) {
             throw new WrongDateOfBirth();
+        }
+
         return date;
     }
 

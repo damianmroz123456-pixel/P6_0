@@ -4,6 +4,7 @@ import java.util.*;
 class WrongStudentName extends Exception {}
 class WrongAge extends Exception {}
 class WrongDateOfBirth extends Exception {}
+class WrongMenuChoice extends Exception {}
 
 public class Main {
     public static Scanner scan = new Scanner(System.in);
@@ -25,27 +26,36 @@ public class Main {
                     case 0:
                         return;
                     default:
-                        System.out.println("Nieprawidłowa opcja");
+                        throw new WrongMenuChoice();
                 }
+            } catch (WrongMenuChoice e) {
+                System.out.println("Błędny wybór menu!");
             } catch (WrongStudentName e) {
                 System.out.println("Błędne imię studenta!");
             } catch (WrongAge e) {
-                System.out.println("Błędny wiek! Poprawny zakres: 1-99");
+                System.out.println("Błędny wiek! Zakres 1-99");
             } catch (WrongDateOfBirth e) {
-                System.out.println("Błędna data urodzenia! Format DD-MM-YYYY");
+                System.out.println("Błędna data! Format DD-MM-YYYY");
+            } catch (InputMismatchException e) {
+                System.out.println("Menu przyjmuje tylko liczby!");
+                scan.nextLine();
             } catch (IOException e) {
                 System.out.println("Błąd pliku!");
             }
         }
     }
 
-    public static int menu() {
+    public static int menu() throws WrongMenuChoice {
         System.out.println("Wciśnij:");
         System.out.println("1 - dodaj studenta");
         System.out.println("2 - wypisz studentów");
         System.out.println("3 - wyszukaj studenta");
         System.out.println("0 - wyjście");
-        return scan.nextInt();
+
+        int choice = scan.nextInt();
+        if (choice < 0 || choice > 3)
+            throw new WrongMenuChoice();
+        return choice;
     }
 
     public static String readName() throws WrongStudentName {
@@ -69,18 +79,16 @@ public class Main {
         scan.nextLine();
         System.out.print("Podaj datę urodzenia (DD-MM-YYYY): ");
         String date = scan.nextLine();
-
-        if (!date.matches("\\\\d{2}-\\\\d{2}-\\\\d{4}"))
+        if (!date.matches("\\d{2}-\\d{2}-\\d{4}"))
             throw new WrongDateOfBirth();
-
         return date;
     }
 
-    public static void addStudent() throws IOException, WrongStudentName, WrongAge, WrongDateOfBirth {
+    public static void addStudent()
+            throws IOException, WrongStudentName, WrongAge, WrongDateOfBirth {
         String name = readName();
         int age = readAge();
         String date = readDate();
-
         new Service().addStudent(new Student(name, age, date));
         System.out.println("Student dodany");
     }
